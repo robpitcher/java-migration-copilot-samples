@@ -58,4 +58,5 @@ build/
 .vscode/
 
 /logs/
+/storage/
 .migrate-copilot/

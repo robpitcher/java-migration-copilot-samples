@@ -148,6 +148,53 @@ scripts/startapp.sh
 
 To stop, run `stopapp.cmd` or `stopapp.sh` in the `scripts` directory.
 
+### Run inside the repository devcontainer (no Docker required)
+
+From the `asset-manager` directory:
+
+```bash
+bash scripts/startapp-devcontainer.sh
+```
+
+The script installs missing PostgreSQL/RabbitMQ packages using `sudo` and `apt-get`,
+starts the native services, waits for readiness, creates the local database if
+missing, builds both modules using the Maven wrapper, and runs them with the `dev`
+profile. It verifies the web page responds and the worker completes startup before
+reporting success. First use requires access to the Debian package and Maven
+repositories. Package installation uses the base image's signed Debian repositories
+only, routing the Bullseye security feed to Debian's official archive through a
+temporary source list; existing system feeds and signature checks are unchanged.
+Bullseye is archived and no longer receives new security updates; this is a local
+development setup, not a production base image. Package installations must be
+repeated after rebuilding the container.
+
+Open http://localhost:8080 using VS Code's forwarded port. Keep the terminal open;
+**Ctrl+C** stops both Java apps but leaves PostgreSQL and RabbitMQ running. Do not
+use the Docker-based `stopapp.sh` for this mode. App logs are written to `logs/`,
+and both apps share the ignored `storage/` directory; no AWS account is required.
+RabbitMQ's management UI is not enabled by this script.
+
+The development database is `assets_manager`, with a dedicated `assets_dev` role
+and the local-only password `assets_dev`. Existing roles/databases are not reset.
+If that role already has a different password, pass it via
+`ASSET_MANAGER_DB_PASSWORD`. Do not use these development credentials in production.
+To provision only the native services without building or launching Java:
+
+```bash
+bash scripts/startapp-devcontainer.sh --setup-only
+```
+
+The repository's devcontainer configuration installs **JDK 21 and JDK 8 side by
+side** through SDKMAN, keeping JDK 21 as the default for VS Code and other projects.
+Use **Dev Containers: Rebuild Container** to apply the configuration. The startup
+script automatically prefers an installed JDK 8 for this legacy app, without
+changing the default Java for other terminals. Until rebuilding, it uses the
+currently available JDK. To select a specific JDK for this script:
+
+```bash
+ASSET_MANAGER_JAVA_HOME=/path/to/jdk bash scripts/startapp-devcontainer.sh
+```
+
 ## App Modernization
 
 The following sections guide you through the process of modernizing the sample Java application `asset-manager` to Azure using GitHub Copilot app modernization.

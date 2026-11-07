@@ -1,6 +1,12 @@
 {
     "image": "mcr.microsoft.com/devcontainers/java:1-21-bullseye",
+    "forwardPorts": [8080],
     "features": {
+      "ghcr.io/devcontainers/features/java:1": {
+        "version": "21",
+        "additionalVersions": "8",
+        "jdkDistro": "tem"
+      },
       "ghcr.io/devcontainers/features/azure-cli:latest": {
         "extensions": "containerapp rdbms-connect serviceconnector-passwordless"
       }
